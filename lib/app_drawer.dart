@@ -25,14 +25,6 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.add_circle_outline),
-                  title: Text("Create Task"),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/task');
-                  },
-                ),
-                ListTile(
                   leading: Icon(Icons.settings),
                   title: Text("Settings"),
                   onTap: () {
