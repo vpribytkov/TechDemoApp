@@ -98,6 +98,8 @@ class _TaskViewState extends State<TaskView> {
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Description'),
                 controller: _descriptionTextController,
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
                 onSaved: (val) => setState(() => widget.task.description = val),
               ),
               TextFormField(
