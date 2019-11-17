@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tech_demo_app/view/dashboard_view.dart';
+import 'package:tech_demo_app/view/preferences_view.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -30,7 +31,7 @@ class AppDrawer extends StatelessWidget {
                   title: Text("Settings"),
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, '/settings');
+                    Navigator.pushNamed(context, PreferencesView.routeName);
                   },
                 ),
               ],

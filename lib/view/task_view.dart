@@ -7,6 +7,7 @@ import 'package:kiwi/kiwi.dart' as Injection;
 import 'package:rx_command/rx_command.dart';
 
 import 'package:tech_demo_app/app_drawer.dart';
+import 'package:tech_demo_app/preferences.dart';
 import 'package:tech_demo_app/data/task.dart';
 import 'package:tech_demo_app/domain/task_list_model.dart';
 
@@ -103,23 +104,9 @@ class _TaskViewState extends State<TaskView> {
                   maxLines: null,
                   onSaved: (val) => setState(() => widget.task.description = val),
                 ),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Expiration Date'),
-                  controller: _expirationDateTextController,
-                  onTap: () => _selectDate(context),
-                ),
                 SizedBox(height: 15),
-                CupertinoSegmentedControl<Priority>(
-                  padding: EdgeInsets.zero,
-                  children: {
-                    Priority.Low: Icon(Icons.flash_on, color: Colors.grey,),
-                    Priority.Medium: Icon(Icons.flash_on, color: Colors.yellow,),
-                    Priority.High: Icon(Icons.flash_on, color: Colors.red,)
-                  },
-                  onValueChanged: (val) => setState(() => widget.task.priority = val),
-                  groupValue: widget.task.priority,
-                ),
-                SizedBox(height: 15),
+                ..._buildExpirationDate(),
+                ..._buildPriority(),
                 RaisedButton(
                   onPressed: () => _saveChanges(context),
                   padding: const EdgeInsets.only(top: 4, bottom: 4),
@@ -133,6 +120,41 @@ class _TaskViewState extends State<TaskView> {
         )
       )
     );
+  }
+
+  List<Widget> _buildExpirationDate() {
+    if (!globalPreferences.getShowExpirationDate()) {
+      return [];
+    }
+
+    return [
+      TextFormField(
+        decoration: const InputDecoration(labelText: 'Expiration Date'),
+        controller: _expirationDateTextController,
+        onTap: () => _selectDate(context),
+      ),
+      SizedBox(height: 15)
+    ];
+  }
+
+  List<Widget> _buildPriority() {
+    if (!globalPreferences.getShowPriority()) {
+      return [];
+    }
+
+    return [
+      CupertinoSegmentedControl<Priority>(
+        padding: EdgeInsets.zero,
+        children: {
+          Priority.Low: Icon(Icons.flash_on, color: Colors.grey,),
+          Priority.Medium: Icon(Icons.flash_on, color: Colors.yellow,),
+          Priority.High: Icon(Icons.flash_on, color: Colors.red,)
+        },
+        onValueChanged: (val) => setState(() => widget.task.priority = val),
+        groupValue: widget.task.priority,
+      ),
+      SizedBox(height: 15)
+    ];
   }
 
   _validateName(value) {
