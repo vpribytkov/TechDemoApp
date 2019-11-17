@@ -17,6 +17,12 @@ class TaskRepositoryImpl implements TaskRepository {
   Future<void> create(Task task) async {
     final db = await _dbInstance();
 
+    List<Map<String, dynamic>> maxIdResult = await db.rawQuery('SELECT MAX(ID) as MAX_ID from $_tableName');
+
+    int mayBeMaxId = maxIdResult[0]['MAX_ID'];
+    int newId = mayBeMaxId != null ? (mayBeMaxId + 1) : 0;
+
+    task.id = newId;
     await db.insert(_tableName, task.toJson());
   }
 
@@ -75,7 +81,7 @@ class TaskRepositoryImpl implements TaskRepository {
             'description TEXT,'
             'creationDate TEXT,'
             'expirationDate TEXT,'
-            'priority INTEGER'
+            'priority TEXT'
           ')'
         );
     });

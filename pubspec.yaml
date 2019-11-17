@@ -30,6 +30,7 @@ dependencies:
   path_provider: ^1.4.0
   sqflite: 1.1.7+2
   json_annotation: ^3.0.0
+  intl: ^0.16.0
 
 dev_dependencies:
   flutter_test:

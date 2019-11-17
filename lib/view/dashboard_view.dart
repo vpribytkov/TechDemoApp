@@ -7,11 +7,14 @@ import 'package:rx_command/rx_command.dart';
 import 'package:tech_demo_app/app_drawer.dart';
 import 'package:tech_demo_app/data/task.dart';
 import 'package:tech_demo_app/domain/task_list_model.dart';
+import 'package:tech_demo_app/view/task_view.dart';
 
 class DashboardView extends StatelessWidget {
+  static const routeName = "dashboard_view";
+
   @override
   Widget build(BuildContext context) {
-    var command = Injection.Container().resolve<TaskListModel>().loadObservable();
+    var command = Injection.Container().resolve<TaskListModel>().commandLoad;
 
     return Scaffold(
       appBar: AppBar(
@@ -126,18 +129,40 @@ class DashboardView extends StatelessWidget {
   }
 
   Future<void> _refreshTaskList() {
-    Injection.Container().resolve<TaskListModel>().loadTasks();
+    Injection.Container().resolve<TaskListModel>().commandLoad();
   }
 
   void _addNewTask(BuildContext context) {
-    Navigator.pushNamed(context, '/task');
+    var now = DateTime.now();
+
+    Navigator.pushNamed(
+      context,
+      TaskView.routeName,
+      arguments: TaskViewSettings(
+        task: Task(
+          name: '',
+          description: '',
+          creationDate: now,
+          expirationDate: now.add(Duration(days: 7)),
+          priority: Priority.Low
+        ),
+        update: false,
+      )
+    );
   }
 
   void _openTaskEditor(BuildContext context, Task task) {
-    Navigator.pushNamed(context, '/task');
+    Navigator.pushNamed(
+      context,
+      TaskView.routeName,
+      arguments: TaskViewSettings(
+        task: task,
+        update: true,
+      )
+    );
   }
 
   void _removeTask(BuildContext context, Task task) {
-    Injection.Container().resolve<TaskListModel>().removeTask(task);
+    Injection.Container().resolve<TaskListModel>().commandRemove(task);
   }
 }

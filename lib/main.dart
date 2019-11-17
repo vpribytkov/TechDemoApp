@@ -5,6 +5,7 @@ import 'package:tech_demo_app/app_drawer.dart';
 import 'package:tech_demo_app/data/task_repository.dart';
 import 'package:tech_demo_app/domain/task_list_model.dart';
 import 'package:tech_demo_app/view/dashboard_view.dart';
+import 'package:tech_demo_app/view/task_view.dart';
 
 void main() {
   setupDependencies();
@@ -28,11 +29,16 @@ class App extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: DashboardView(),
-      routes: {
-        '/dashboard': (context) => DashboardView(),
-        '/task': (context) => _makeNotImplementedPage('Task'),
-        '/settings': (context) => _makeNotImplementedPage('Settings'),
+      onGenerateRoute: (RouteSettings settings) {
+        var routes = <String, WidgetBuilder>{
+          DashboardView.routeName: (context) => DashboardView(),
+          TaskView.routeName: (context) => TaskView(settings.arguments),
+        };
+        return MaterialPageRoute(builder: (context) => routes[settings.name](context));
       },
+      onUnknownRoute: (RouteSettings settings) {
+        return MaterialPageRoute(builder: (context) => _makeNotImplementedPage(settings.name));
+      }
     );
   }
 }

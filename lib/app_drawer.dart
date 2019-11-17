@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tech_demo_app/view/dashboard_view.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -21,7 +22,7 @@ class AppDrawer extends StatelessWidget {
                   title: Text("Dashboard"),
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, '/dashboard');
+                    Navigator.pushNamed(context, DashboardView.routeName);
                   },
                 ),
                 ListTile(
