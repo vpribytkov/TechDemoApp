@@ -81,52 +81,54 @@ class _TaskViewState extends State<TaskView> {
   }
 
   _buildForm(context, loading) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-      child: Builder(
-        builder: (context) => Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Name'),
-                controller: _nameTextController,
-                validator: (value) => _validateName(value),
-                onSaved: (val) => setState(() => widget.task.name = val),
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Description'),
-                controller: _descriptionTextController,
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                onSaved: (val) => setState(() => widget.task.description = val),
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Expiration Date'),
-                controller: _expirationDateTextController,
-                onTap: () => _selectDate(context),
-              ),
-              SizedBox(height: 15),
-              CupertinoSegmentedControl<Priority>(
-                padding: EdgeInsets.zero,
-                children: {
-                  Priority.Low: Icon(Icons.flash_on, color: Colors.grey,),
-                  Priority.Medium: Icon(Icons.flash_on, color: Colors.yellow,),
-                  Priority.High: Icon(Icons.flash_on, color: Colors.red,)
-                },
-                onValueChanged: (val) => setState(() => widget.task.priority = val),
-                groupValue: widget.task.priority,
-              ),
-              SizedBox(height: 15),
-              RaisedButton(
-                onPressed: () => _saveChanges(context),
-                padding: const EdgeInsets.only(top: 4, bottom: 4),
-                child: loading
-                  ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 3))
-                  : Text(widget.update ? 'Update' : 'Create'),
-              ),
-            ]
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+        child: Builder(
+          builder: (context) => Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Name'),
+                  controller: _nameTextController,
+                  validator: (value) => _validateName(value),
+                  onSaved: (val) => setState(() => widget.task.name = val),
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Description'),
+                  controller: _descriptionTextController,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  onSaved: (val) => setState(() => widget.task.description = val),
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Expiration Date'),
+                  controller: _expirationDateTextController,
+                  onTap: () => _selectDate(context),
+                ),
+                SizedBox(height: 15),
+                CupertinoSegmentedControl<Priority>(
+                  padding: EdgeInsets.zero,
+                  children: {
+                    Priority.Low: Icon(Icons.flash_on, color: Colors.grey,),
+                    Priority.Medium: Icon(Icons.flash_on, color: Colors.yellow,),
+                    Priority.High: Icon(Icons.flash_on, color: Colors.red,)
+                  },
+                  onValueChanged: (val) => setState(() => widget.task.priority = val),
+                  groupValue: widget.task.priority,
+                ),
+                SizedBox(height: 15),
+                RaisedButton(
+                  onPressed: () => _saveChanges(context),
+                  padding: const EdgeInsets.only(top: 4, bottom: 4),
+                  child: loading
+                    ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 3))
+                    : Text(widget.update ? 'Update' : 'Create'),
+                ),
+              ]
+            )
           )
         )
       )
