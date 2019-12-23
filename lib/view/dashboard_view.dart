@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
 import 'package:kiwi/kiwi.dart' as Injection;
 import 'package:rx_command/rx_command.dart';
 
@@ -99,11 +100,7 @@ class DashboardView extends StatelessWidget {
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
       actionExtentRatio: 0.20,
-      child: ListTile(
-        title: Text(task.name),
-        subtitle: Text(task.description),
-        onTap: () => _openTaskEditor(context, task),
-      ),
+      child: _buildListRowContent(context, task),
       dismissal: SlidableDismissal(
         child: SlidableDrawerDismissal(),
         onDismissed: (actionType) {
@@ -125,6 +122,52 @@ class DashboardView extends StatelessWidget {
           onTap: () => _removeTask(context, task),
         ),
       ],
+    );
+  }
+
+  Widget _buildListRowContent(BuildContext context, Task task) {
+    const colorByPriority = {
+      Priority.Low: Colors.grey,
+      Priority.Medium: Colors.green,
+      Priority.High: Colors.red
+    };
+
+    return GestureDetector(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+        child: Row(
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                _drawCircle(color: colorByPriority[task.priority]),
+                Text(DateFormat.yMMMd().format(task.expirationDate)),
+              ],
+            ),
+            Container(
+                height: 50,
+                child: VerticalDivider(color: Colors.black45, thickness: 1.0,)
+            ),
+            Column(
+              children: <Widget>[
+                Text(task.name),
+                Text(task.description)
+              ],
+            )
+          ],
+        ),
+      ),
+      onTap: () => _openTaskEditor(context, task),
+    );
+  }
+
+  Widget _drawCircle({ width = 20.0, height = 20.0, color }) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+      ),
     );
   }
 
