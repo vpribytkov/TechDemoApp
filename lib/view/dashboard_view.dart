@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:kiwi/kiwi.dart' as Injection;
-import 'package:rx_command/rx_command.dart';
 
 import 'package:tech_demo_app/app_drawer.dart';
 import 'package:tech_demo_app/data/task.dart';
@@ -15,18 +14,74 @@ class DashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var command = Injection.Container().resolve<TaskListModel>().commandLoad;
+    var taskListModel = Injection.Container().resolve<TaskListModel>();
 
     return Scaffold(
       appBar: AppBar(
         title: Text("Dashboard"),
+        actions: <Widget>[
+          StreamBuilder<SortOrder>(
+            stream: taskListModel.sortOrder,
+            builder: (BuildContext context, AsyncSnapshot<SortOrder> snapshot) {
+              final sortOrder = snapshot.data;
+
+              return IconButton(
+                icon: Icon(sortOrder == SortOrder.Ascending ? Icons.arrow_upward : Icons.arrow_downward),
+                onPressed: () {
+                  taskListModel.sort(
+                    order: sortOrder == SortOrder.Descending ? SortOrder.Ascending : SortOrder.Descending,
+                    criterion: null
+                  );
+                },
+              );
+            }
+          ),
+          StreamBuilder<SortCriterion>(
+            stream: taskListModel.sortCriterion,
+            builder: (BuildContext context, AsyncSnapshot<SortCriterion> snapshot) {
+              final criterion = snapshot.data;
+
+              return PopupMenuButton<SortCriterion>(
+                onSelected: (SortCriterion criterion) {
+                  taskListModel.sort(order: null, criterion: criterion);
+                },
+                itemBuilder: (BuildContext context) {
+                  return <PopupMenuEntry<SortCriterion>>[
+                    const PopupMenuItem(
+                      child: Text("Sort by:"),
+                      value: SortCriterion.CreationDate,
+                      enabled: false,
+                    ),
+                    const PopupMenuDivider(),
+                    CheckedPopupMenuItem<SortCriterion>(
+                      value: SortCriterion.CreationDate,
+                      child: Text('Creation date'),
+                      checked: criterion == SortCriterion.CreationDate,
+                    ),
+                    CheckedPopupMenuItem<SortCriterion>(
+                      value: SortCriterion.ExpirationDate,
+                      child: Text('Expiration date'),
+                      checked: criterion == SortCriterion.ExpirationDate,
+                    ),
+                    CheckedPopupMenuItem<SortCriterion>(
+                      value: SortCriterion.Priority,
+                      child: Text('Priority'),
+                      checked: criterion == SortCriterion.Priority,
+                    ),
+                  ];
+                },
+                icon: Icon(Icons.sort),
+              );
+            },
+          ),
+        ],
       ),
       drawer: AppDrawer(),
-      body: StreamBuilder<CommandResult<List<Task>>>(
-        stream: command.results,
-        builder: (BuildContext context, AsyncSnapshot<CommandResult<List<Task>>> snapshot) {
+      body: StreamBuilder<TaskListInfo>(
+        stream: taskListModel.tasks,
+        builder: (BuildContext context, AsyncSnapshot<TaskListInfo> snapshot) {
           final result = snapshot.data;
-          if (result == null || result.isExecuting) {
+          if (result == null || result.loading) {
             return _buildLoader(context);
           }
 
@@ -37,10 +92,10 @@ class DashboardView extends StatelessWidget {
           return _buildList(context, result.data);
         }
       ),
-      floatingActionButton: StreamBuilder<CommandResult<List<Task>>>(
-        stream: command.results,
-        builder: (BuildContext context, AsyncSnapshot<CommandResult<List<Task>>> snapshot) {
-          bool hideButton = !snapshot.hasData || snapshot.data.isExecuting || snapshot.data.hasError;
+      floatingActionButton: StreamBuilder<TaskListInfo>(
+        stream: taskListModel.tasks,
+        builder: (BuildContext context, AsyncSnapshot<TaskListInfo> snapshot) {
+          bool hideButton = !snapshot.hasData || snapshot.data.loading || snapshot.data.hasError;
           if (hideButton) {
             return Container();
           }
@@ -172,7 +227,7 @@ class DashboardView extends StatelessWidget {
   }
 
   Future<void> _refreshTaskList() {
-    Injection.Container().resolve<TaskListModel>().commandLoad();
+    Injection.Container().resolve<TaskListModel>().load();
   }
 
   void _addNewTask(BuildContext context) {
