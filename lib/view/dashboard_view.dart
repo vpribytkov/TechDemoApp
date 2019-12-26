@@ -192,11 +192,20 @@ class DashboardView extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
         child: Row(
           children: <Widget>[
-            Column(
-              children: <Widget>[
-                _drawCircle(color: colorByPriority[task.priority]),
-                Text(DateFormat.yMMMd().format(task.expirationDate)),
-              ],
+            Container(
+              child: Column(
+                children: <Widget>[
+                  _drawCircle(color: colorByPriority[task.priority]),
+                  Padding(
+                    child: Text(
+                      DateFormat.yMMMd().format(task.expirationDate),
+                      style: TextStyle(fontSize: 14.0),
+                    ),
+                    padding: EdgeInsets.only(top: 10),
+                  )
+                ],
+              ),
+              width: 100,
             ),
             Container(
                 height: 50,
@@ -204,8 +213,8 @@ class DashboardView extends StatelessWidget {
             ),
             Column(
               children: <Widget>[
-                Text(task.name),
-                Text(task.description)
+                Text(task.name, style: TextStyle(fontSize: 18.0),),
+                Text(task.description, style: TextStyle(fontSize: 14.0),),
               ],
             )
           ],
