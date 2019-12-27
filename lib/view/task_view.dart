@@ -91,34 +91,36 @@ class _TaskViewState extends State<TaskView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Name'),
-                  controller: _nameTextController,
-                  validator: (value) => _validateName(value),
-                  onSaved: (val) => setState(() => widget.task.name = val),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  controller: _descriptionTextController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  onSaved: (val) => setState(() => widget.task.description = val),
-                ),
+                _buildNameWidget(),
+                _buildDescriptionWidget(),
                 SizedBox(height: 15),
                 ..._buildExpirationDate(),
                 ..._buildPriority(),
-                RaisedButton(
-                  onPressed: () => _saveChanges(context),
-                  padding: const EdgeInsets.only(top: 4, bottom: 4),
-                  child: loading
-                    ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 3))
-                    : Text(widget.update ? 'Update' : 'Create'),
-                ),
+                _buildUpdateButton(loading),
               ]
             )
           )
         )
       )
+    );
+  }
+
+  Widget _buildNameWidget() {
+    return TextFormField(
+      decoration: const InputDecoration(labelText: 'Name'),
+      controller: _nameTextController,
+      validator: (value) => _validateName(value),
+      onSaved: (val) => setState(() => widget.task.name = val),
+    );
+  }
+
+  Widget _buildDescriptionWidget() {
+    return TextFormField(
+      decoration: const InputDecoration(labelText: 'Description'),
+      controller: _descriptionTextController,
+      keyboardType: TextInputType.multiline,
+      maxLines: null,
+      onSaved: (val) => setState(() => widget.task.description = val),
     );
   }
 
@@ -135,6 +137,22 @@ class _TaskViewState extends State<TaskView> {
       ),
       SizedBox(height: 15)
     ];
+  }
+
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: widget.task.expirationDate,
+        firstDate: DateTime(2000, 1, 1),
+        lastDate: DateTime(2020, 12, 31)
+    );
+
+    if (picked != null && picked != widget.task.expirationDate) {
+      setState(() {
+        widget.task.expirationDate = picked;
+        _expirationDateTextController.text = _formattedExpirationDate();
+      });
+    }
   }
 
   List<Widget> _buildPriority() {
@@ -157,6 +175,16 @@ class _TaskViewState extends State<TaskView> {
     ];
   }
 
+  Widget _buildUpdateButton(loading) {
+    return RaisedButton(
+      onPressed: () => _saveChanges(context),
+      padding: const EdgeInsets.only(top: 4, bottom: 4),
+      child: loading
+          ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 3))
+          : Text(widget.update ? 'Update' : 'Create'),
+    );
+  }
+
   _validateName(value) {
     if (value.isEmpty) {
       return 'Please enter name';
@@ -165,21 +193,7 @@ class _TaskViewState extends State<TaskView> {
     return null;
   }
 
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-      context: context,
-      initialDate: widget.task.expirationDate,
-      firstDate: DateTime(2000, 1, 1),
-      lastDate: DateTime(2020, 12, 31)
-    );
 
-    if (picked != null && picked != widget.task.expirationDate) {
-      setState(() {
-        widget.task.expirationDate = picked;
-        _expirationDateTextController.text = _formattedExpirationDate();
-      });
-    }
-  }
 
   _saveChanges(context) {
     final form = _formKey.currentState;
